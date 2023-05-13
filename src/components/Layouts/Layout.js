@@ -9,24 +9,24 @@ const variants = {
 };
 
 const Layout = ({ children, title }) => {
-  document.title = title + " | Artsy";
+  document.title = title + " | EXL";
   const [activeKey, setActiveKey] = useState(null);
   return (
-    <div>
+    <div className="flex flex-col min-h-screen">
       <motion.article
-        //  initial="hidden"
+        initial="hidden"
         animate="enter"
         exit="exit"
         variants={variants}
         transition={{ duration: 0.45, type: "easeInOut" }}
-        style={{ position: "relative" }}
+        style={{ flex: 1 }}
       >
         <Header
           appearance="default"
           activeKey={activeKey}
           onSelect={setActiveKey}
         />
-        <div className="sm:mt-14 mb-60">{children}</div>
+        <div className="sm:mt-14">{children}</div>
       </motion.article>
       <Footer />
     </div>

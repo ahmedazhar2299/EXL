@@ -2,6 +2,7 @@ import React from "react";
 import { AiFillHome } from "react-icons/ai";
 import { IoMdAdd } from "react-icons/io";
 import { MdPendingActions } from "react-icons/md";
+import { HiBan } from "react-icons/hi";
 import { useNavigate } from "react-router-dom";
 import { Navbar, Nav } from "rsuite";
 const Header = ({ onSelect, activeKey, ...props }) => {
@@ -47,6 +48,16 @@ const Header = ({ onSelect, activeKey, ...props }) => {
               eventKey="3"
             >
               Pending
+            </Nav.Item>
+            <Nav.Item
+              onClick={() => {
+                navigate("/unapproved");
+              }}
+              className="flex items-center gap-1"
+              icon={<HiBan />}
+              eventKey="4"
+            >
+              Unapproved
             </Nav.Item>
           </Nav.Menu>
         </Nav>

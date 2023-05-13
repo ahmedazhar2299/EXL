@@ -6,7 +6,7 @@ import { AiOutlineCheck, AiOutlineClose } from "react-icons/ai";
 import Toaster from "../../../../components/Common/Toaster";
 import API from "../../../../api/server";
 
-const ProductTable = ({ data, pendingProducts }) => {
+const ProductTable = ({ data }) => {
   const { Column, HeaderCell, Cell } = Table;
   const [sortColumn, setSortColumn] = useState();
   const [sortType, setSortType] = useState();
@@ -45,48 +45,6 @@ const ProductTable = ({ data, pendingProducts }) => {
     }, 500);
   };
 
-  const approveProduct = async (rowData) => {
-    const urlPath =
-      rowData.city +
-      "/" +
-      rowData.category +
-      "/" +
-      rowData.subcategory +
-      "/" +
-      rowData.brand +
-      "/" +
-      rowData.model;
-    const res = await API.post("/exl/products/approve/" + urlPath);
-    if (res.data) {
-      if (!res.data.startsWith("Failed")) {
-        pendingProducts();
-        Toaster(toaster, "success", "Product Approved");
-      } else {
-        Toaster(toaster, "error", "Failed to Approve");
-      }
-    }
-  };
-  const unapproveProduct = async (rowData) => {
-    const urlPath =
-      rowData.city +
-      "/" +
-      rowData.category +
-      "/" +
-      rowData.subcategory +
-      "/" +
-      rowData.brand +
-      "/" +
-      rowData.model;
-    const res = await API.post("/exl/products/unapprove/" + urlPath);
-    if (res.data) {
-      if (!res.data.startsWith("Failed")) {
-        pendingProducts();
-        Toaster(toaster, "success", "Product Unapproved");
-      } else {
-        Toaster(toaster, "error", "Failed to Unapprove");
-      }
-    }
-  };
 
   return (
     <>
@@ -128,29 +86,20 @@ const ProductTable = ({ data, pendingProducts }) => {
 
           <Column align="center" width={300}>
             <HeaderCell className="font-extrabold text-black" flexGrow={1}>
-              Approval
+              Status
             </HeaderCell>
             <Cell
               style={{
                 padding: "6px",
+                textAlign: "center",
+                width: "100%",
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
               }}
+              className="text-red-500 font-bold "
             >
-              {(rowData) => (
-                <div className="flex gap-2 w-full justify-center items-center h-full">
-                  <button
-                    onClick={() => approveProduct(rowData)}
-                    className="focus:outline-none bg-green-600 active:bg-green-700 py-1 px-3 rounded-lg text-sm text-white font-extrabold"
-                  >
-                    <AiOutlineCheck />
-                  </button>
-                  <button
-                    onClick={() => unapproveProduct(rowData)}
-                    className="focus:outline-none bg-red-600 active:bg-red-700 py-1 px-3 rounded-lg text-sm text-white font-extrabold"
-                  >
-                    <AiOutlineClose />
-                  </button>
-                </div>
-              )}
+              Unapproved
             </Cell>
           </Column>
 

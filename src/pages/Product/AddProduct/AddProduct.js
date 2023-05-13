@@ -6,17 +6,50 @@ import { AiOutlineUpload } from "react-icons/ai";
 import { BsFiletypeXml } from "react-icons/bs";
 import { useToaster } from "rsuite";
 import Toaster from "../../../components/Common/Toaster";
+import API from "../../../api/server";
+import { useNavigate } from "react-router-dom";
 
 const AddProduct = () => {
   const [images, setImages] = useState([]);
   const [xmlFile, setXmlFile] = useState(null);
   const toaster = useToaster();
+  const navigate = useNavigate();
 
-  const handleXmlUpload = (event) => {
-    setXmlFile(event.target.files[0]);
+  const handleXmlUpload = (e) => {
+    e.preventDefault();
+
+    if (e.target.files[0]) {
+      const reader = new FileReader();
+      reader.onload = async () => {
+        const xmlData = reader.result;
+        const xmlString = xmlData.toString();
+        setXmlFile(xmlString);
+      };
+      reader.readAsText(e.target.files[0]);
+    } else {
+      console.error("No XML file selected");
+    }
   };
-  const createNewProduct = () => {
+
+  const createNewProduct = async () => {
     if (images.length > 0 && xmlFile) {
+      const formData = new FormData();
+      for (let i = 0; i < images.length && i < 9; i++) {
+        formData.append(`image${i + 1}`, images[i]);
+      }
+      formData.append("xml", xmlFile);
+      const config = {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      };
+      const res = await API.post("/exl/filereader", formData);
+      if (res.data && res.data !== "Failed") {
+        navigate("/pending");
+        Toaster(toaster, "success", "Upload succesful");
+      } else {
+        Toaster(toaster, "error", "Server Error");
+      }
     } else {
       Toaster(toaster, "error", "Missing Uploads");
     }
@@ -47,6 +80,7 @@ const AddProduct = () => {
                 type="file"
                 id="file-upload"
                 class="hidden"
+                accept=".xml"
               />
               {!xmlFile ? (
                 <>
@@ -66,7 +100,7 @@ const AddProduct = () => {
                   class="z-20 flex flex-col-reverse items-center justify-center w-full h-full cursor-pointer"
                 >
                   <p class="z-10 text-xs font-light text-center text-gray-500">
-                    {xmlFile.name}
+                    File.xml
                   </p>
                   <BsFiletypeXml />
                 </label>

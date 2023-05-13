@@ -7,24 +7,46 @@ import ProductCategoryFilter from "../../components/Product/ProductCategoryFilte
 import ProductCityFilter from "../../components/Product/ProductCityFilter";
 import displayBanner from "../../assets/images/banner.jpg";
 const Home = () => {
-  const dat = ["Gaming Gear", "Video Game"].map((item) => ({
-    label: item,
-    value: item,
-  }));
-  const [items, setItems] = useState([1, 2, 3, 5, 6]);
+  const [items, setItems] = useState([]);
+  const [city, setCity] = useState("");
+  const [category, setCategory] = useState("");
 
-  const getCategoryItems = async (category) => {
+  const removeCategory = () => setCategory("");
+  const updateCategory = (categoryName) => setCategory(categoryName);
+  const removeCity = () => {
+    setCity("");
+  };
+  const updateCity = (cityName) => {
+    if (cityName) setCity(cityName.toLowerCase());
+  };
+
+  const getAllItems = async () => {
     try {
+      const res = await API.get("/exl/products/all/approved");
+      res.data && setItems(res.data.products);
     } catch (error) {
       console.log(error);
     }
   };
-  const getItems = async () => {
+
+  const getfilterItems = async () => {
     try {
+      const URL = "/exl/products/filter/" + city + category;
+      console.log(URL);
+      const res = await API.get(URL);
+      res.data && setItems(res.data.products);
     } catch (error) {
       console.log(error);
     }
   };
+
+  useEffect(() => {
+    getAllItems();
+  }, []);
+
+  useEffect(() => {
+    getfilterItems();
+  }, [city, category]);
 
   return (
     <Layout title={"All Products"}>
@@ -33,8 +55,11 @@ const Home = () => {
       </div>
       <div className="container mx-auto">
         <div className="flex flex-col sm:flex-row justify-start items-center gap-5 my-10">
-          <ProductCityFilter />
-          <ProductCategoryFilter />
+          <ProductCityFilter updateCity={updateCity} removeCity={removeCity} />
+          <ProductCategoryFilter
+            updateCategory={updateCategory}
+            removeCategory={removeCategory}
+          />
         </div>
 
         {!items ? (
@@ -43,8 +68,8 @@ const Home = () => {
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-5 px-5">
-            {items?.map((photo) => (
-              <ProductCard key={photo?._id} item={photo} />
+            {items?.map((data) => (
+              <ProductCard key={data?._id} detail={data} />
             ))}
           </div>
         )}
