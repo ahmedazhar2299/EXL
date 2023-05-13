@@ -45,7 +45,6 @@ public class filereader extends HttpServlet {
             DocumentBuilder builder = factory.newDocumentBuilder();
             Document document = builder.parse(fileContent);
 
-            // Get the data from the XML file
             Element marketplaceElement = document.getDocumentElement();
             NodeList categoryNodes = marketplaceElement.getElementsByTagName("Category");
 
@@ -59,12 +58,11 @@ public class filereader extends HttpServlet {
                     String subcategoryName = subcategoryElement.getElementsByTagName("name").item(0).getTextContent();
                     String brandName = subcategoryElement.getElementsByTagName("brand").item(0).getTextContent();
                     String modelName = subcategoryElement.getElementsByTagName("model").item(0).getTextContent();
-                    String fileName = "file.xml";
+                    String fileName = "pending.xml";
                     String city = subcategoryElement.getElementsByTagName("city").item(0).getTextContent();
-                    String directoryPath = "E:/marketplace/" + city + "/" + categoryName + "/" + subcategoryName + "/" + brandName + "/" + modelName;
+                    String directoryPath = "E:/marketplace/" + city.toLowerCase() + "/" + categoryName.toLowerCase() + "/" + subcategoryName.toLowerCase() + "/" + brandName.toLowerCase() + "/" + modelName.toLowerCase();
                     Files.createDirectories(Paths.get(directoryPath));
 
-                    // Save the XML file
                     File file = new File(directoryPath, fileName);
                     try (OutputStream outputStream = new FileOutputStream(file)) {
                         TransformerFactory transformerFactory = TransformerFactory.newInstance();
@@ -74,11 +72,9 @@ public class filereader extends HttpServlet {
                         transformer.transform(source, result);
                     }
 
-                    // Save the images
                     String imagesFolderPath = directoryPath + "/images";
                     Files.createDirectories(Paths.get(imagesFolderPath));
 
-                    // Save the images
                     for (int k = 1; k <= 3; k++) {
                         Part imagePart = request.getPart("image" + k);
                         if (imagePart != null) {
@@ -92,43 +88,11 @@ public class filereader extends HttpServlet {
                 }
             }
 
-            // Return a success response
             response.setContentType("text/plain");
             response.setCharacterEncoding("UTF-8");
             response.getWriter().write("Data saved successfully.");
         } catch (Exception e) {
-            // Handle any errors that occurred during XML parsing or file handling
             response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Error occurred: " + e.getMessage());
-        }
-    }
-
-    @Override
-    public void doGet(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        response.setHeader("Access-Control-Allow-Origin", "*");
-        response.setContentType("application/json");
-        response.setCharacterEncoding("UTF-8");
-        Greeting greeting = new Greeting("Hello, World!");
-        Gson gson = new Gson();
-        String json = gson.toJson(greeting);
-        response.getWriter().write(json);
-    }
-
-    private class Greeting {
-        private String message;
-        private String[] bobo = new String[2];
-
-        public Greeting(String message) {
-            this.message = message;
-            bobo[0] = "asg";
-            bobo[1] = "sad";
-        }
-
-        public String getMessage() {
-            return message;
-        }
-        public void setMessage(String message) {
-            this.message = message;
         }
     }
 }
